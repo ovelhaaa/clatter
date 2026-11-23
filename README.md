@@ -62,12 +62,20 @@ npm run check:lxr    # rebuild and compare with the committed binary
 
 ## Deployment
 
-`.github/workflows/pages.yml` type-checks, rebuilds the engine from source, runs the unit and
-browser tests and builds every push; pushes to `main` are deployed to GitHub Pages. The custom
-domain `clatter.allmyfriendsaresynths.com` is set by the `CNAME` file, which the workflow copies
-into the site. For it to serve, the repository's Pages source must be set to **GitHub Actions**
-and the domain needs a DNS `CNAME` record pointing to `clickysteve.github.io`. Because asset
-paths are relative, the same build also works at `https://clickysteve.github.io/clatter/`.
+The app is deployed to **https://ovelhaaa.github.io/clatter/** by
+[the Pages workflow](.github/workflows/pages.yml). The workflow rebuilds the LXR
+WebAssembly engine from the published C sources, type-checks, runs unit tests,
+builds the static site, verifies the required assets, and runs the Playwright
+browser tests. After all checks pass, pushes to `main` publish `dist/` to GitHub Pages.
+Pull requests run checks but are never deployed; the workflow can also be started
+manually under Actions.
+
+For initial setup, open **Settings → Pages → Build and deployment → Source** in GitHub
+and select **GitHub Actions**. Remove any previously configured custom domain
+under **Settings → Pages → Custom domain**: this repository intentionally does
+not ship a `CNAME` file. Vite uses relative asset URLs (`base: './'`),
+including for the LXR `.wasm` and AudioWorklet assets, so the app works
+under the repository subpath `/clatter/`.
 
 ## Documentation
 
