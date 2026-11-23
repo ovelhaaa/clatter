@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "description": "CLATTER: generative drum synthesis and rhythmic destruction. A browser drum workstation from the Slop Factory, with the LXR-02's open-source synthesis engine running in WebAssembly.",
-  "homepage": "https://clatter.allmyfriendsaresynths.com",
+  "homepage": "https://ovelhaaa.github.io/clatter/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/clickysteve/clatter.git"
+    "url": "https://github.com/ovelhaaa/clatter.git"
   },
   "license": "GPL-3.0-only",
   "type": "module",
