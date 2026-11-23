@@ -169,6 +169,33 @@ svg {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+#menubar .pwa-badge,
+#menubar .pwa-btn {
+  flex: 0 0 auto;
+  font-family: var(--font-2);
+  font-size: var(--fs-2);
+  letter-spacing: 0.5px;
+  padding: calc(2 * var(--px)) calc(8 * var(--px));
+  border: var(--u) solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.2;
+}
+#menubar .pwa-btn {
+  cursor: pointer;
+}
+#menubar .pwa-btn:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+#menubar .pwa-btn.pwa-update {
+  background: var(--ink);
+  color: var(--paper);
+}
+#menubar .pwa-btn.pwa-update:hover {
+  background: var(--paper);
+  color: var(--ink);
+}
 .dropdown {
   position: absolute;
   top: 100%;

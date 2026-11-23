@@ -33,6 +33,10 @@ Open the site (or run it locally, below) in a current Chrome, Edge, Firefox or S
 **SPACE** to play. **G** generates a pattern, **K** a kit, **W** plays the wildcard; **?** lists
 every key. Projects autosave in the browser; FILE saves them as files.
 
+CLATTER is also an installable **PWA** that runs completely offline once cached: in Chrome/Edge
+click **INSTALL** in the status bar (or **CLATTER → Install CLATTER…**), or see
+[docs/PWA.md](docs/PWA.md) for Safari instructions, cache details, and safe live-audio updates.
+
 Views: **PATTERN** (the grid and its step editor; generator, transformation toolbar, track and
 edit panels under it; **? KEY** explains the grid), **SOUND** (a track sidebar
 and SYNTH, SAMPLE, MODULATION, VARIATIONS, MIXER, FX and KITS tabs; variations A-D per track), the **STEP SOUND**
@@ -94,6 +98,8 @@ under the repository subpath `/clatter/`.
 - [docs/KIT_GENERATION.md](docs/KIT_GENERATION.md): how GENERATE KIT, MUTATE and DISCOVER design sounds: CHARACTER recipes, WILDNESS, choosing among rendered candidates by audio analysis, kit contrast, and the development-time evaluator (`npm run eval:kits`) with its before/after findings.
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): the three systems, the engine, timing, state,
   files and tests.
+- [docs/PWA.md](docs/PWA.md): installable PWA architecture, offline precaching, persistence, safe
+  live-audio updates, Web MIDI limits, and local/CI verification.
 
 ## Licence
 

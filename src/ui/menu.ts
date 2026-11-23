@@ -4,9 +4,10 @@
  * Copyright (C) 2026 The CLATTER contributors. SPDX-License-Identifier: GPL-3.0-only
  */
 import type { App } from '../app/app';
+import type { PwaController } from '../pwa';
 import { PRESETS } from '../model/presets';
 import { exportKitDialog } from './kitExportDialog';
-import { aboutDialog, confirmDialog, exportDialog, helpDialog, paletteDialog } from './dialogs';
+import { aboutDialog, confirmDialog, exportDialog, helpDialog, installDialog, paletteDialog } from './dialogs';
 import { importFolder, importZip, kitLibraryDialog, openKitFile } from './kitDialogs';
 import { DEFAULT_SCALE, SCALES, scaleLabel } from './scale';
 import { chooseFiles, closePopups, download, h } from './widgets';
@@ -29,7 +30,20 @@ export function closeMenus(): void {
   openMenu = null;
 }
 
-export function menubar(app: App, screen: HTMLElement): { bar: HTMLElement; status: HTMLElement } {
+export function promptPwaUpdate(app: App, pwa: PwaController): void {
+  if (app.ui.playing || app.exporter.busy || app.kitExport.busy) {
+    confirmDialog(
+      'UPDATE AVAILABLE',
+      'A new version of CLATTER is ready. Stop playback and reload to apply the update? Your project and samples are saved.',
+      'STOP & UPDATE',
+      () => void pwa.applyUpdate(true),
+    );
+    return;
+  }
+  void pwa.applyUpdate(false);
+}
+
+export function menubar(app: App, screen: HTMLElement, pwa?: PwaController): { bar: HTMLElement; status: HTMLElement } {
   const bar = h('div', '', screen);
   bar.id = 'menubar';
   bar.setAttribute('role', 'menubar');
@@ -46,7 +60,20 @@ export function menubar(app: App, screen: HTMLElement): { bar: HTMLElement; stat
     }
   };
   const menus: [string, () => Entry[], string?][] = [
-    ['CLATTER', () => [{ label: 'About CLATTER, licence and source…', action: aboutDialog }, { label: 'Keys and gestures…', key: '?', action: helpDialog }], 'logo'],
+    [
+      'CLATTER',
+      () => {
+        const items: Entry[] = [
+          { label: 'About CLATTER, licence and source…', action: aboutDialog },
+          { label: 'Keys and gestures…', key: '?', action: helpDialog },
+        ];
+        if (pwa?.state.canInstall) items.push({ label: 'Install CLATTER…', action: () => void pwa.promptInstall() });
+        else if (pwa && !pwa.state.standalone) items.push({ label: 'Install as app…', action: () => installDialog(pwa) });
+        if (pwa?.state.updateAvailable) items.push('sep', { label: 'Apply update…', action: () => promptPwaUpdate(app, pwa) });
+        return items;
+      },
+      'logo',
+    ],
     [
       'FILE',
       () => [
@@ -126,7 +153,7 @@ export function menubar(app: App, screen: HTMLElement): { bar: HTMLElement; stat
         return list;
       },
     ],
-    ['HELP', () => [{ label: 'Keys and gestures…', action: helpDialog }, { label: 'About, licence and source…', action: aboutDialog }]],
+    ['HELP', () => [{ label: 'Keys and gestures…', action: helpDialog }, { label: 'Install as app…', action: () => installDialog(pwa) }, { label: 'About, licence and source…', action: aboutDialog }]],
   ];
   const buildList = (drop: HTMLElement, entries: Entry[]) => {
     for (const e of entries) {

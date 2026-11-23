@@ -7,8 +7,9 @@
  */
 import './ui/style.css';
 import { App } from './app/app';
+import { PwaController } from './pwa';
 import { loadPrefs } from './app/prefs';
-import { closeMenus, menubar } from './ui/menu';
+import { closeMenus, menubar, promptPwaUpdate } from './ui/menu';
 import { applySelectedPalette } from './ui/palette';
 import { transportWindow } from './ui/views/transport';
 import { patternView, type View } from './ui/views/patternView';
@@ -43,7 +44,10 @@ async function main(): Promise<void> {
   msg.style.marginBottom = cpx(10);
   h('div', 'hint', loading.body, 'Generative drum synthesis · LXR-02 firmware DSP in WebAssembly');
   const app = new App();
-  (window as unknown as { clatter: App }).clatter = app;
+  const pwa = new PwaController(app);
+  (window as unknown as { clatter: App; clatterPwa: PwaController }).clatter = app;
+  (window as unknown as { clatterPwa: PwaController }).clatterPwa = pwa;
+  pwa.init();
   window.addEventListener('pagehide', () => app.flushSave());
   try {
     await app.boot(import.meta.env.BASE_URL);
@@ -55,10 +59,31 @@ async function main(): Promise<void> {
   }
   loading.el.remove();
 
-  const { bar, status } = menubar(app, chrome);
+  const { bar, status } = menubar(app, chrome, pwa);
   const st = h('div', '', status);
   st.dataset.test = 'status';
   const midiSt = h('div', '', status);
+  const offlineBadge = h('span', 'pwa-badge', status, 'OFFLINE');
+  offlineBadge.dataset.test = 'pwa-offline';
+  offlineBadge.hidden = true;
+  const installBtn = h('button', 'pwa-btn', status, 'INSTALL');
+  installBtn.type = 'button';
+  installBtn.dataset.test = 'pwa-install';
+  installBtn.hidden = true;
+  installBtn.addEventListener('click', () => void pwa.promptInstall());
+  const updateBtn = h('button', 'pwa-btn pwa-update', status, 'UPDATE AVAILABLE');
+  updateBtn.type = 'button';
+  updateBtn.dataset.test = 'pwa-update';
+  updateBtn.hidden = true;
+  updateBtn.addEventListener('click', () => promptPwaUpdate(app, pwa));
+
+  const showPwa = () => {
+    offlineBadge.hidden = pwa.state.online;
+    installBtn.hidden = !pwa.state.canInstall;
+    updateBtn.hidden = !pwa.state.updateAvailable;
+  };
+  pwa.onChange(showPwa);
+  showPwa();
   const showStatus = () => {
     st.textContent = (app.ui.busy ? '… ' : '') + app.ui.status;
     const m = app.midi;

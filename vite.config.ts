@@ -1,4 +1,5 @@
 import { defineConfig, type Plugin } from 'vite';
+import { VitePWA } from 'vite-plugin-pwa';
 import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 
@@ -33,7 +34,61 @@ export default defineConfig({
   server: { port: 5231 },
   worker: { format: 'es' },
   build: { target: 'es2022', assetsInlineLimit: 0 },
-  plugins: [notices()],
+  plugins: [
+    notices(),
+    VitePWA({
+      registerType: 'prompt',
+      injectRegister: false,
+      manifest: {
+        id: './',
+        name: 'CLATTER',
+        short_name: 'CLATTER',
+        description: 'Generative Drum Synthesis & Rhythmic Destruction',
+        start_url: './',
+        scope: './',
+        display: 'standalone',
+        orientation: 'any',
+        theme_color: '#000000',
+        background_color: '#000000',
+        categories: ['music', 'utilities'],
+        icons: [
+          {
+            src: 'icons/icon-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: 'icons/icon-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: 'icons/icon-maskable-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+          {
+            src: 'icons/icon-maskable-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+        ],
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,wasm,woff,woff2,png,svg,json,wav,txt,md}'],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        cleanupOutdatedCaches: true,
+        skipWaiting: false,
+        clientsClaim: false,
+        dontCacheBustURLsMatching: /assets\//,
+        navigateFallback: 'index.html',
+      },
+    }),
+  ],
   define: {
     __BUILD_COMMIT__: JSON.stringify(process.env.GITHUB_SHA?.slice(0, 7) ?? commit()),
     __BUILD_DATE__: JSON.stringify(new Date().toISOString().slice(0, 10)),

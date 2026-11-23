@@ -61,6 +61,14 @@ jobs:
       - name: Verify deploy assets
         run: |
           test -f dist/index.html
+          test -f dist/manifest.webmanifest
+          test -f dist/sw.js
+          test -f dist/icons/icon-192.png
+          test -f dist/icons/icon-512.png
+          test -f dist/icons/icon-maskable-192.png
+          test -f dist/icons/icon-maskable-512.png
+          test -f dist/icons/apple-touch-icon.png
+          find dist -maxdepth 1 -type f -name 'workbox-*.js' | grep -q .
           test -f dist/samples/index.json
           test -f dist/LICENSE.txt
           test -f dist/NOTICE.md

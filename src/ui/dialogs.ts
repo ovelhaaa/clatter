@@ -4,6 +4,7 @@
  * Copyright (C) 2026 The CLATTER contributors. SPDX-License-Identifier: GPL-3.0-only
  */
 import type { App } from '../app/app';
+import type { PwaController } from '../pwa';
 import { paletteEditor } from '@slopfactory/core/palette';
 import { applyPalette } from '@slopfactory/core/palette';
 import { PALETTE_CONFIG, palettes } from './palette';
@@ -313,6 +314,39 @@ export function confirmDialog(title: string, text: string, ok: string, fn: () =>
       true,
     ],
   ]);
+}
+
+export function installDialog(pwa?: PwaController): void {
+  const box = dialog('INSTALL CLATTER', 560);
+  const s = h('div', 'scroll', box);
+  if (pwa?.state.standalone) {
+    h('p', '', s, 'CLATTER is already running as an installed standalone application.');
+    buttons(box, [['OK', closeDialog, true]]);
+    return;
+  }
+  h('p', '', s, 'Install CLATTER to run in its own standalone window and work completely offline (LXR WASM engine, AudioWorklet, factory samples, and local projects).');
+  if (pwa?.state.canInstall) {
+    h('p', '', s, 'Your browser supports direct installation. Click INSTALL NOW below, or use the install icon in your address bar.');
+    buttons(box, [
+      ['LATER', closeDialog],
+      [
+        'INSTALL NOW',
+        () => {
+          closeDialog();
+          void pwa.promptInstall();
+        },
+        true,
+      ],
+    ]);
+    return;
+  }
+  h('h3', '', s, 'CHROME / EDGE (WINDOWS, LINUX, MACOS, ANDROID)');
+  h('p', '', s, 'Open the browser menu or look for the install icon in the address bar, then choose "Install CLATTER".');
+  h('h3', '', s, 'SAFARI (IOS / IPADOS)');
+  h('p', '', s, 'Tap Share, then choose "Add to Home Screen".');
+  h('h3', '', s, 'SAFARI (MACOS)');
+  h('p', '', s, 'Choose File → Add to Dock.');
+  buttons(box, [['OK', closeDialog, true]]);
 }
 
 declare const __BUILD_COMMIT__: string;

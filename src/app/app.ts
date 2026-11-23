@@ -159,6 +159,7 @@ export class App {
   private stopTicker: (() => void) | null = null;
   private sentSamples = new Set<string>();
   private saveTimer: ReturnType<typeof setTimeout> | null = null;
+  private saveWarned = false;
   private evolveHome: SynthKit | null = null;
   private evolveStep = 0;
   private bundledIds = new Map<string, string>();
@@ -471,8 +472,12 @@ export class App {
     this.saveTimer = null;
     try {
       localStorage.setItem(AUTOSAVE_KEY, serialize(this.project));
+      this.saveWarned = false;
     } catch {
-      /* storage full or blocked */
+      if (!this.saveWarned) {
+        this.saveWarned = true;
+        this.notify('STORAGE FULL: COULD NOT AUTOSAVE PROJECT', 'error');
+      }
     }
   }
 
